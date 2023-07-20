@@ -1,11 +1,4 @@
-import {
-  ChangeEvent,
-  FC,
-  KeyboardEvent,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { ChangeEvent, FC, KeyboardEvent, useEffect, useState } from "react";
 import { InputEnterProps } from "src/components/InputEnter/InputEnterProps";
 import { KeyboardSpecialKey } from "src/enums/KeyboardSpecialKey";
 import { InputSearchProps } from "src/components/InputSearch/InputSearchProps";
@@ -50,7 +43,8 @@ const Input = styled.input<InputSearchProps>`
   font-size: 16px;
   border: 1px solid gray;
   border-radius: 4px;
-  width: ${({ value }) => (value ? `${value.length || 0}ch` : "1ch")};
+  width: ${({ value }: { value: string }) =>
+    value ? `${(value && value.length) || 0}ch` : "1ch"};
   min-width: 20px;
 
   &::placeholder {

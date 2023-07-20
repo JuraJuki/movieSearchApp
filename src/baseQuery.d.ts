@@ -1,11 +1,12 @@
 import { MaybePromise } from "@reduxjs/toolkit/dist/query/tsHelpers";
+import { ThunkDispatch } from "redux-thunk";
 
 export type BaseQueryFn<
-  Args = any,
+  Args = unknown,
   Result = unknown,
   Error = unknown,
-  DefinitionExtraOptions = {},
-  Meta = {},
+  DefinitionExtraOptions = object,
+  Meta = object,
 > = (
   args: Args,
   api: BaseQueryApi,
@@ -14,7 +15,7 @@ export type BaseQueryFn<
 
 export interface BaseQueryApi {
   signal: AbortSignal;
-  dispatch: ThunkDispatch<any, any, any>;
+  dispatch: ThunkDispatch<unknown, unknown, unknown>;
   getState: () => unknown;
 }
 

@@ -15,7 +15,7 @@ export const Movie: FC<MovieProps> = (props) => {
   if (props.disableLink)
     return (
       posterPath && (
-        <MovieWrap width={props.imgSize}>
+        <MovieWrap imgSize={props.imgSize}>
           <Image src={bgLink} alt="movieBg" />
         </MovieWrap>
       )
@@ -72,8 +72,9 @@ const LinkedMovieWrap = styled(Link)`
 // Covers wrap when disableLink is true
 const MovieWrap = styled.div`
   ${MovieWrapStyle}
-  width: ${(props) => (props.width ? props.width : 200)}px;
-  height: ${(props) => (props.width ? props.width * 1.5 : 300)}px;
+  width: ${(props: MovieProps) => (props.imgSize ? props.imgSize : 200)}px;
+  height: ${(props: MovieProps) =>
+    props.imgSize ? props.imgSize * 1.5 : 300}px;
   cursor: initial;
 
   &:hover {
@@ -81,8 +82,9 @@ const MovieWrap = styled.div`
   }
 
   img {
-    width: ${(props) => (props.width ? props.width : 200)}px;
-    height: ${(props) => (props.width ? props.width * 1.5 : 300)}px;
+    width: ${(props: MovieProps) => (props.imgSize ? props.imgSize : 200)}px;
+    height: ${(props: MovieProps) =>
+      props.imgSize ? props.imgSize * 1.5 : 300}px;
     position: initial;
   }
 `;

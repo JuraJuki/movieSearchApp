@@ -19,7 +19,9 @@ export const MovieSearch: FC = () => {
   useEffect(() => {
     if (!inputValue || inputValue === "") return;
 
-    fetchMovies({ name: inputValue, page });
+    fetchMovies({ name: inputValue, page }).catch((err) => console.log(err));
+    // dependencies are correct
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputValue, page]);
 
   return (

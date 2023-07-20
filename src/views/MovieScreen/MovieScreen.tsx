@@ -13,12 +13,12 @@ import { Movie } from "src/views/MovieSearch/components/MovieList/components/Mov
 import styled, { css } from "styled-components";
 
 export const MovieScreen: FC = () => {
-  let { movieId } = useParams();
+  const { movieId } = useParams();
   const navigate = useNavigate();
   const { data, isFetching }: ReduxHookReturn<MovieDetailsType> =
     useGetMovieByIdQuery(movieId);
 
-  if (!data && isFetching) return <Loader loading={isFetching} />;
+  if (!data && isFetching) return <Loader />;
 
   const renderGenres = () => {
     return data?.genres.map((genre) => (

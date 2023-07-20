@@ -32,6 +32,8 @@ export const InputSearch: FC<InputSearchProps> = (props) => {
     if (!!debouncedValue && !pressedEnter) onDebounce?.(value);
 
     if (pressedEnter) setPressedEnter(false);
+    // dependencies are correct
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedValue]);
 
   const handleEnterPress = (e: KeyboardEvent<HTMLInputElement>) => {
