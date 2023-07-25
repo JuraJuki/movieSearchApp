@@ -1,10 +1,8 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosResponse } from "axios";
-import { ThunkAction } from "redux-thunk";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import axios from "axios";
 import { MoviesResponse } from "src/store/slices/interfaces/MoviesResponse";
 import { MoviesSliceState } from "src/store/slices/MoviesSliceState";
 import { MovieType } from "src/store/types/MovieType";
-import { AppDispatch, RootState } from "../store";
 
 const initialState: MoviesSliceState = {
   movie: null,
@@ -65,9 +63,9 @@ const apiKey = import.meta.env.VITE_MOVIES_API_KEY;
 const baseUrl = import.meta.env.VITE_MOVIES_API_URL;
 
 // Thunk action for fetching a single movie
-export const getMovie =
-  (movieId: number): ThunkAction<void, RootState, unknown, any> =>
-  async (dispatch: AppDispatch) => {
+export const getMovie = createAsyncThunk(
+  "movies/getMovie",
+  async (movieId: number, { dispatch }) => {
     dispatch(getMovieStart());
 
     try {
@@ -78,29 +76,26 @@ export const getMovie =
     } catch (error: Error) {
       dispatch(getMovieFail(error.message));
     }
-  };
-
-// getMovieById: builder.query<MovieType, string>({
-//       query: (movieId) =>
-//         `movie/${movieId}?api_key=${import.meta.env.VITE_MOVIES_API_KEY}`,
-//     }),
+  },
+);
 
 // Thunk action for fetching movies with pagination and name search
-export const getMovies =
-  (name: string): ThunkAction =>
-  async (dispatch: AppDispatch, getState: () => RootState) => {
+export const getMovies = createAsyncThunk(
+  "movies/getMovies",
+  async (name: string, { dispatch, getState }) => {
     dispatch(getMoviesStart());
 
     const { page }: MoviesSliceState = getState().movies;
     const params = { page, query: name };
 
-    await axios
-      .get<MoviesResponse, AxiosResponse<MoviesResponse>>(
+    try {
+      const response = await axios.get<MoviesResponse>(
         `${baseUrl}/search/movie?language=en-US&api_key=${apiKey}`,
         { params },
-      )
-      .then((response) => {
-        dispatch(getMoviesSuccess(response.data));
-      })
-      .catch((err) => dispatch(getMoviesFail(err.message)));
-  };
+      );
+      dispatch(getMoviesSuccess(response.data));
+    } catch (err) {
+      dispatch(getMoviesFail(err.message));
+    }
+  },
+);
