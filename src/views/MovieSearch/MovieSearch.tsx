@@ -1,53 +1,47 @@
 import { FC, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { HorizontalCentered } from "src/components/HorizontalCentered/HorizontalCentered";
-import { useLazyGetMoviesQuery } from "src/store/slices/moviesSlice";
-import { MovieType } from "src/store/types/MovieType";
-import { PaginationQueryData } from "src/store/types/PaginationQueryData";
-import { ReduxLazyHookReturn } from "src/store/types/ReduxLazyHookReturn";
 import { InputSearch } from "src/components/InputSearch/InputSearch";
+import { getMovies } from "src/store/slices/moviesSlice";
+import { RootState } from "src/store/store";
+import { MovieType } from "src/store/types/MovieType";
 import { MovieList } from "src/views/MovieSearch/components/MovieList/MovieList";
 import { PaginationControls } from "src/views/MovieSearch/components/PaginationControls/PaginationControls";
 
 export const MovieSearch: FC = () => {
   const [inputValue, setInputValue] = useState("");
-  const [page, setPage] = useState(1);
 
-  const [fetchMovies, { isLoading, data }]: ReduxLazyHookReturn<
-    PaginationQueryData<MovieType[]>
-  > = useLazyGetMoviesQuery();
+  // can be extracted to a custom hook "useGetMovies"
+  const dispatch = useDispatch();
+  const { movies, loading, page } = useSelector<RootState, MovieType[]>(
+    (state) => state.movies,
+  );
 
   useEffect(() => {
-    if (!inputValue || inputValue === "") return;
+    if (!inputValue) return;
 
-    fetchMovies({ name: inputValue, page }).catch((err) => console.log(err));
-    // dependencies are correct
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputValue, page]);
+    dispatch(getMovies(inputValue));
+  }, [dispatch, inputValue, page]);
+  //____
+
+  const setSearchValue = (value: string) => setInputValue(value);
+  const handleEnterSearch = (value) => {
+    setSearchValue(value);
+    if (value === "") dispatch(getMovies(""));
+  };
 
   return (
     <HorizontalCentered>
       <h2>Movie Searcher</h2>
       <InputSearch
         debounceTime={500}
-        onDebounce={(value: string) => {
-          setInputValue(value);
-          setPage(1);
-        }}
-        onEnter={(value: string) => {
-          setInputValue(value);
-          setPage(1);
-        }}
+        onDebounce={setSearchValue}
+        onEnter={handleEnterSearch}
         placeholder={"Search movies.."}
-        loading={isLoading}
+        loading={loading}
       />
-      <MovieList movies={data?.results} />
-      {data?.results.length ? (
-        <PaginationControls
-          page={Number(page)}
-          totalPages={Number(data?.total_pages) || 0}
-          setPage={setPage}
-        />
-      ) : null}
+      <MovieList movies={movies.length ? movies : null} />
+      {movies.length ? <PaginationControls /> : null}
     </HorizontalCentered>
   );
 };

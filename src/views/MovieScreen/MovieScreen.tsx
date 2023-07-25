@@ -1,13 +1,14 @@
-import { FC } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { FC, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
 import { HorizontalCentered } from "src/components/HorizontalCentered/HorizontalCentered";
 import { IconButton } from "src/components/IconButton/IconButton";
 import { ArrowLeft } from "src/components/icons/ArrowLeft";
 import Loader from "src/components/Loader/Loader";
 import { Route } from "src/router/Route";
-import { useGetMovieByIdQuery } from "src/store/slices/moviesSlice";
-import { MovieDetailsType } from "src/store/types/MovieDetailsType";
-import { ReduxHookReturn } from "src/store/types/ReduxHookReturn";
+import { getMovie } from "src/store/slices/moviesSlice";
+import { RootState } from "src/store/store";
+import { MovieType } from "src/store/types/MovieType";
 import { laptop, mobile, tablet } from "src/styles/appSize";
 import { Movie } from "src/views/MovieSearch/components/MovieList/components/Movie";
 import styled, { css } from "styled-components";
@@ -15,13 +16,22 @@ import styled, { css } from "styled-components";
 export const MovieScreen: FC = () => {
   const { movieId } = useParams();
   const navigate = useNavigate();
-  const { data, isFetching }: ReduxHookReturn<MovieDetailsType> =
-    useGetMovieByIdQuery(movieId);
 
-  if (!data && isFetching) return <Loader />;
+  // can be extracted to a custom hook "useGetMovie"
+  const dispatch = useDispatch();
+  const { movie, loading } = useSelector<RootState, MovieType[]>(
+    (state) => state.movies,
+  );
+
+  useEffect(() => {
+    dispatch(getMovie(movieId));
+  }, [dispatch, movieId]);
+  // ____
+
+  if (!movie || loading) return <Loader />;
 
   const renderGenres = () => {
-    return data?.genres.map((genre) => (
+    return movie?.genres.map((genre) => (
       <Genre key={genre.id}>{genre.name}</Genre>
     ));
   };
@@ -32,20 +42,20 @@ export const MovieScreen: FC = () => {
         <IconButton name={<ArrowLeft />} onClick={() => navigate(Route.Home)} />
       </Header>
       <Wrap>
-        <Movie movie={data} imgSize={"300"} disableLink={true} />
+        <Movie movie={movie} imgSize={"300"} disableLink={true} />
         <InfoWrap>
           <Title>
-            <span>{data?.title}</span>
+            <span>{movie?.title}</span>
             <OriginalTitle
-              href={`https://www.imdb.com/title/${data?.imdb_id}/`}
+              href={`https://www.imdb.com/title/${movie?.imdb_id}/`}
               target="_blank"
               rel="noopener noreferrer"
-            >{`( ${data?.original_title} )`}</OriginalTitle>
+            >{`( ${movie?.original_title} )`}</OriginalTitle>
           </Title>
           <GenresWrap>
             <i>{renderGenres()}</i>
           </GenresWrap>
-          <Overview>{data?.overview}</Overview>
+          <Overview>{movie?.overview}</Overview>
         </InfoWrap>
       </Wrap>
     </HorizontalCentered>

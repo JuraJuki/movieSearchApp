@@ -15,6 +15,8 @@ export const Movie: FC<MovieProps> = (props) => {
   if (props.disableLink)
     return (
       posterPath && (
+        // App throws unknown prop warning.
+        // Will be fixed with next version of styled components
         <MovieWrap imgSize={props.imgSize}>
           <Image src={bgLink} alt="movieBg" />
         </MovieWrap>
